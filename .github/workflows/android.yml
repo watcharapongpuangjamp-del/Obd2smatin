@@ -5,6 +5,7 @@ on:
     branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -30,6 +31,12 @@ jobs:
 
     - name: Build Debug APK
       run: gradle assembleDebug --no-daemon
+
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: debug-apk
+        path: app/build/outputs/apk/debug/app-debug.apk
 
     - name: Run Unit Tests
       run: gradle testDebugUnitTest --no-daemon

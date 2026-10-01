@@ -15,7 +15,7 @@ android {
   compileSdk = 36
 
   defaultConfig {
-    applicationId = "com.aistudio.thaiautoobd.diagnostics"
+    applicationId = "com.aistudio.smartosm.xvpqwe"
     minSdk = 24
     targetSdk = 36
     versionCode = 250

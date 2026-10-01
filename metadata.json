@@ -1,6 +1,6 @@
 {
-  "name": "Thai Car OBD-II Pro",
-  "description": "Professional OBD-II Diagnostic tool with USB OTG hardware support, live telemetry, ECU DTC scanning, and Gemini AI Mechanic.",
+  "name": "Smart OSM",
+  "description": "ระบบจัดการข้อมูลอาสาสมัครสาธารณสุขประจำหมู่บ้าน (อสม.) ที่มีรากฐานด้าน Data Integrity, Identity และการ Sync ข้อมูลที่ถูกต้อง",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

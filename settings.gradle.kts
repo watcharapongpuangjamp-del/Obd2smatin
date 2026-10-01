@@ -23,6 +23,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "Thai Car OBD-II Pro"
+rootProject.name = "Smart OSM"
 
 include(":app")
