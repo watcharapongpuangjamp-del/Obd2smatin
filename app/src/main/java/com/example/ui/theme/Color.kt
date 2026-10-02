@@ -18,3 +18,10 @@ val TextMuted = Color(0xFF64748B)
 
 val PurpleAi = Color(0xFFA855F7)
 val PurpleGlow = Color(0xFFC084FC)
+
+// Night Driving Mode (Pure High Contrast)
+val NightDrivingBackground = Color(0xFF000000)
+val NightDrivingPrimary = Color(0xFFFF0000) // Vibrant Red for alerts
+val NightDrivingSecondary = Color(0xFF00FF00) // Vibrant Green for safety
+val NightDrivingOnBackground = Color(0xFFFFFFFF)
+val NightDrivingSurface = Color(0xFF111111)

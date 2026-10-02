@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
 import com.example.ui.components.ExitConfirmationDialog
 import com.example.ui.ThaiObdApp
 import com.example.ui.theme.ThaiCarOBDTheme
@@ -23,7 +24,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ThaiCarOBDTheme {
+            val appTheme by viewModel.appTheme.collectAsState()
+            
+            ThaiCarOBDTheme(appTheme = appTheme) {
                 var showSplash by remember { mutableStateOf(true) }
                 var showExitDialog by remember { mutableStateOf(false) }
 

@@ -85,30 +85,30 @@ fun ThaiObdApp(viewModel: MainViewModel) {
                 title = {
                     Column {
                         Text(
-                            text = "Thai Car OBD-II Pro",
+                            text = "Smart OSM",
                             fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold,
                             fontSize = 18.sp,
-                            color = TextPrimary
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
                             text = "v2.6.0 Pro (OBD-II Engine)",
                             fontSize = 11.sp,
-                            color = CyanPrimary
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
                 actions = {
                     IconButton(onClick = { currentScreen = Screen.DeveloperStory }) {
-                        Icon(Icons.Default.Info, contentDescription = "Developer Story", tint = CyanPrimary)
+                        Icon(Icons.Default.Info, contentDescription = "Developer Story", tint = MaterialTheme.colorScheme.primary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkBackground)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
         bottomBar = {
             NavigationBar(
-                containerColor = SurfaceDark,
-                contentColor = TextPrimary
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface
             ) {
                 listOf(
                     Screen.Dashboard,
@@ -125,13 +125,13 @@ fun ThaiObdApp(viewModel: MainViewModel) {
                             Icon(
                                 imageVector = screen.icon,
                                 contentDescription = screen.titleTh,
-                                tint = if (isSelected) CyanPrimary else TextSecondary
+                                tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                             )
                         },
                         label = {
                             Text(
                                 text = screen.titleTh,
-                                color = if (isSelected) CyanPrimary else TextSecondary,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                                 fontSize = 11.sp,
                                 fontWeight = if (isSelected) androidx.compose.ui.text.font.FontWeight.Bold else androidx.compose.ui.text.font.FontWeight.Normal
                             )
@@ -141,7 +141,7 @@ fun ThaiObdApp(viewModel: MainViewModel) {
                 }
             }
         },
-        containerColor = DarkBackground
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -245,17 +245,22 @@ fun ThaiObdApp(viewModel: MainViewModel) {
                         }
                     }
                 )
-                Screen.Profile -> VehicleProfileScreen(
-                    profiles = profiles,
-                    selectedProfile = selectedProfile,
-                    onSelectProfile = { viewModel.selectVehicleProfile(it) },
-                    onAddProfile = { name, make, model, year, engine, plate, mileage ->
-                        viewModel.addVehicleProfile(name, make, model, year, engine, plate, mileage)
-                    },
-                    onAddMaintenanceLog = { title, cost, mileage, category ->
-                        viewModel.addMaintenanceLog(title, cost, mileage, category)
-                    }
-                )
+                Screen.Profile -> {
+                    val appTheme by viewModel.appTheme.collectAsStateWithLifecycle()
+                    VehicleProfileScreen(
+                        profiles = profiles,
+                        selectedProfile = selectedProfile,
+                        appTheme = appTheme,
+                        onThemeChanged = { viewModel.setAppTheme(it) },
+                        onSelectProfile = { viewModel.selectVehicleProfile(it) },
+                        onAddProfile = { name, make, model, year, engine, plate, mileage ->
+                            viewModel.addVehicleProfile(name, make, model, year, engine, plate, mileage)
+                        },
+                        onAddMaintenanceLog = { title, cost, mileage, category ->
+                            viewModel.addMaintenanceLog(title, cost, mileage, category)
+                        }
+                    )
+                }
                 Screen.DeveloperStory -> DeveloperStoryScreen(
                     onNavigateBack = { currentScreen = Screen.Dashboard }
                 )

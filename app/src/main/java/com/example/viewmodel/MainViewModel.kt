@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.db.MaintenanceLogEntity
 import com.example.db.VehicleProfileEntity
 import com.example.hardware.SimulatorScenario
+import com.example.model.AppTheme
 import com.example.model.AiAnalysisResult
 import com.example.model.AppOperationMode
 import com.example.model.CachedDtcScanHistory
@@ -277,6 +278,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
+
+    private val _appTheme = MutableStateFlow(AppTheme.DARK)
+    val appTheme: StateFlow<AppTheme> = _appTheme.asStateFlow()
+
+    fun setAppTheme(theme: AppTheme) {
+        _appTheme.value = theme
+    }
 
     init {
         // Collect telemetry for Trip Analytics
