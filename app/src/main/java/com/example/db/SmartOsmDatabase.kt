@@ -8,10 +8,11 @@ import androidx.room.RoomDatabase
 @Database(
     entities = [
         VillageEntity::class,
+        VillageMembershipEntity::class,
         HouseholdEntity::class,
         PersonEntity::class
     ],
-    version = 1,
+    version = 3,
     exportSchema = false
 )
 abstract class SmartOsmDatabase : RoomDatabase() {
@@ -27,7 +28,7 @@ abstract class SmartOsmDatabase : RoomDatabase() {
                     context.applicationContext,
                     SmartOsmDatabase::class.java,
                     "smart_osm_db"
-                ).fallbackToDestructiveMigration()
+                ).fallbackToDestructiveMigration(true)
                 .build()
                 INSTANCE = instance
                 instance

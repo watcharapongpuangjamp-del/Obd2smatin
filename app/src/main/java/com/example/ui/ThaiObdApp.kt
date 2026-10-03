@@ -4,8 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material3.*
@@ -17,6 +20,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hardware.usb.UsbConnectionUiEvent
 import com.example.ui.components.UsbConnectionNotificationToast
 import com.example.ui.screens.*
@@ -27,6 +31,7 @@ import com.example.ui.theme.SurfaceDark
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
 import com.example.viewmodel.MainViewModel
+import com.example.viewmodel.OsmViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -37,11 +42,15 @@ sealed class Screen(val route: String, val titleTh: String, val icon: ImageVecto
     object Predictive : Screen("predictive", "คาดการณ์", Icons.Default.HourglassTop)
     object Profile : Screen("profile", "ข้อมูลรถ", Icons.Default.DirectionsCar)
     object DeveloperStory : Screen("developer_story", "เรื่องราวนักพัฒนา", Icons.Default.Info)
+    object VillageDashboard : Screen("village_dashboard", "พื้นที่ อสม.", Icons.Default.Map)
+    object HouseholdRegistry : Screen("household_registry", "หลังคาเรือน", Icons.Default.Home)
+    object PersonProfile : Screen("person_profile", "สมาชิก", Icons.Default.People)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThaiObdApp(viewModel: MainViewModel) {
+    val osmViewModel: OsmViewModel = viewModel()
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Dashboard) }
 
     val activeMode by viewModel.activeMode.collectAsStateWithLifecycle()
@@ -62,6 +71,14 @@ fun ThaiObdApp(viewModel: MainViewModel) {
     val serviceIntervals by viewModel.serviceIntervals.collectAsStateWithLifecycle()
     val dtcClearTracker by viewModel.dtcClearTracker.collectAsStateWithLifecycle()
     val activeMaintenanceAlerts by viewModel.activeMaintenanceAlerts.collectAsStateWithLifecycle()
+
+    // OSM States
+    val myVillages by osmViewModel.myVillages.collectAsStateWithLifecycle()
+    val selectedVillage by osmViewModel.selectedVillage.collectAsStateWithLifecycle()
+    val households by osmViewModel.householdsInSelectedVillage.collectAsStateWithLifecycle()
+    val selectedHousehold by osmViewModel.selectedHousehold.collectAsStateWithLifecycle()
+    val persons by osmViewModel.personsInSelectedHousehold.collectAsStateWithLifecycle()
+
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -113,7 +130,7 @@ fun ThaiObdApp(viewModel: MainViewModel) {
                 listOf(
                     Screen.Dashboard,
                     Screen.DtcScan,
-                    Screen.AiMechanic,
+                    Screen.VillageDashboard,
                     Screen.Predictive,
                     Screen.Profile
                 ).forEach { screen ->
@@ -258,6 +275,38 @@ fun ThaiObdApp(viewModel: MainViewModel) {
                         },
                         onAddMaintenanceLog = { title, cost, mileage, category ->
                             viewModel.addMaintenanceLog(title, cost, mileage, category)
+                        }
+                    )
+                }
+                Screen.VillageDashboard -> VillageDashboardScreen(
+                    villages = myVillages,
+                    onVillageClick = { 
+                        osmViewModel.selectVillage(it)
+                        currentScreen = Screen.HouseholdRegistry
+                    },
+                    onAddVillage = { id, name, desc -> osmViewModel.addVillage(id, name, desc) },
+                    onSyncClick = { osmViewModel.triggerSync() },
+                    onAiConsultClick = { osmViewModel.requestAiConsult() }
+                )
+                Screen.HouseholdRegistry -> selectedVillage?.let { village ->
+                    HouseholdRegistryScreen(
+                        village = village,
+                        households = households,
+                        onBackClick = { currentScreen = Screen.VillageDashboard },
+                        onHouseholdClick = {
+                            osmViewModel.selectHousehold(it)
+                            currentScreen = Screen.PersonProfile
+                        },
+                        onAddHousehold = { houseNo -> osmViewModel.addHousehold(houseNo) }
+                    )
+                }
+                Screen.PersonProfile -> selectedHousehold?.let { household ->
+                    PersonProfileScreen(
+                        household = household,
+                        persons = persons,
+                        onBackClick = { currentScreen = Screen.HouseholdRegistry },
+                        onAddPerson = { title, first, last, birth ->
+                            osmViewModel.addPerson(title, first, last, birth)
                         }
                     )
                 }

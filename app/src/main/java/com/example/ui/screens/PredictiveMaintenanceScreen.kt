@@ -534,7 +534,7 @@ fun DtcClearTrackerCard(
                         .testTag("btn_simulate_km"),
                     contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
                     shape = RoundedCornerShape(8.dp),
-                    border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(CyanPrimary.copy(alpha = 0.6f)))
+                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(brush = androidx.compose.ui.graphics.SolidColor(CyanPrimary.copy(alpha = 0.6f)))
                 ) {
                     Icon(
                         imageVector = Icons.Default.Speed,

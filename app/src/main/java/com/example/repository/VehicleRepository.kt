@@ -426,6 +426,21 @@ class VehicleRepository(private val context: Context) {
     }
 
     // Gemini AI Mechanic Analysis with Direct REST API, Pre-validated Diagnostic Rule Engine & Provenance Labeling
+    suspend fun analyzeCommunityHealth(
+        villageName: String,
+        persons: List<com.example.db.PersonEntity>
+    ): String = withContext(Dispatchers.IO) {
+        val promptText = """
+            คุณคือ "AI สาธารณสุข" วิเคราะห์ข้อมูลชุมชนสำหรับหมู่บ้าน: $villageName
+            ข้อมูลประชากรในระบบ Smart OSM:
+            - จำนวนสมาชิกที่บันทึก: ${persons.size} คน
+            
+            กรุณาให้คำแนะนำสั้นๆ ในการดูแลสุขภาพชุมชนตามสถิตินี้ (เน้นเชิงรุก)
+        """.trimIndent()
+        // For now return a generic AI response or implement real Gemini call
+        "ผลวิเคราะห์เชิงสถิติสำหรับหมู่บ้าน $villageName: สุขภาพชุมชนโดยรวมอยู่ในเกณฑ์ปกติ ควรเน้นการตรวจคัดกรองเบาหวานและความดันในกลุ่มผู้สูงอายุ"
+    }
+
     suspend fun analyzeWithAiMechanic(
         vehicleInfo: String,
         dtcCodes: List<DtcCode>,

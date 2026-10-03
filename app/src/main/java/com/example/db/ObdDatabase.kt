@@ -297,7 +297,7 @@ abstract class ObdDatabase : RoomDatabase() {
                     ObdDatabase::class.java,
                     "thai_car_obd_db"
                 ).addMigrations(MIGRATION_1_2, MIGRATION_2_3)
-                .fallbackToDestructiveMigration()
+                .fallbackToDestructiveMigration(true)
                 .build()
                 INSTANCE = instance
                 instance

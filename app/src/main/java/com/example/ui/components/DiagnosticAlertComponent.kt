@@ -199,7 +199,7 @@ fun DiagnosticAlertComponent(
                         .fillMaxWidth()
                         .padding(top = 10.dp)
                 ) {
-                    Divider(
+                    HorizontalDivider(
                         color = SurfaceCard,
                         thickness = 1.dp,
                         modifier = Modifier.padding(bottom = 10.dp)

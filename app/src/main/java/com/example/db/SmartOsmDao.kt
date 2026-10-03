@@ -30,4 +30,19 @@ interface SmartOsmDao {
     @Transaction
     @Query("SELECT * FROM persons WHERE personUuid = :personUuid")
     suspend fun getPersonWithDetails(personUuid: String): PersonEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMembership(membership: VillageMembershipEntity)
+
+    @Query("SELECT villageId FROM village_memberships WHERE uid = :uid")
+    fun getAssignedVillages(uid: String): Flow<List<String>>
+
+    @Query("SELECT * FROM villages WHERE villageId IN (SELECT villageId FROM village_memberships WHERE uid = :uid)")
+    fun getMyVillages(uid: String): Flow<List<VillageEntity>>
+
+    @Query("SELECT * FROM households WHERE isDirty = 1")
+    fun getAllDirtyHouseholds(): Flow<List<HouseholdEntity>>
+
+    @Query("SELECT * FROM persons WHERE isDirty = 1")
+    fun getAllDirtyPersons(): Flow<List<PersonEntity>>
 }

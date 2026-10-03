@@ -9,7 +9,35 @@ import androidx.room.Index
 data class VillageEntity(
     @PrimaryKey val villageId: String,
     val name: String,
-    val description: String = ""
+    val description: String = "",
+    val lastSync: Long = 0,
+    val isDirty: Boolean = true
+)
+
+/**
+ * Maps Firebase Auth user.uid to a specific village.
+ * Represents the "Membership / Permission" layer in the identity hierarchy.
+ */
+@Entity(
+    tableName = "village_memberships",
+    primaryKeys = ["uid", "villageId"],
+    foreignKeys = [
+        ForeignKey(
+            entity = VillageEntity::class,
+            parentColumns = ["villageId"],
+            childColumns = ["villageId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["villageId"])]
+)
+data class VillageMembershipEntity(
+    val uid: String,
+    val villageId: String,
+    val role: String = "OSM", // OSM, HEAD_OSM, ADMIN
+    val grantedAt: Long = System.currentTimeMillis(),
+    val lastSync: Long = 0,
+    val isDirty: Boolean = true
 )
 
 @Entity(
@@ -28,7 +56,9 @@ data class HouseholdEntity(
     @PrimaryKey val householdUuid: String,
     val villageId: String,
     val houseNo: String, // Note: houseNo is NOT the identity, householdUuid is.
-    val lastUpdated: Long = System.currentTimeMillis()
+    val lastUpdated: Long = System.currentTimeMillis(),
+    val lastSync: Long = 0,
+    val isDirty: Boolean = true
 )
 
 @Entity(
@@ -50,5 +80,7 @@ data class PersonEntity(
     val firstName: String,
     val lastName: String,
     val birthDate: Long,
-    val lastUpdated: Long = System.currentTimeMillis()
+    val lastUpdated: Long = System.currentTimeMillis(),
+    val lastSync: Long = 0,
+    val isDirty: Boolean = true
 )
