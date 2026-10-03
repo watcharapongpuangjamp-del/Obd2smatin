@@ -15,7 +15,7 @@ android {
   compileSdk = 36
 
   defaultConfig {
-    applicationId = "com.aistudio.smartosm.xvpqwe"
+    applicationId = "com.aistudio.slotinsight.vjzkpx"
     minSdk = 24
     targetSdk = 36
     versionCode = 250
@@ -123,6 +123,9 @@ dependencies {
   implementation(libs.retrofit)
   implementation(libs.google.ai.generativeai)
   implementation(libs.usb.serial.android)
+  implementation(libs.vico.compose)
+  implementation(libs.vico.compose.m3)
+  implementation(libs.vico.core)
   testImplementation(libs.androidx.compose.ui.test.junit4)
   testImplementation(libs.androidx.core)
   testImplementation(libs.androidx.junit)

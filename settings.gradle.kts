@@ -23,6 +23,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "Smart OSM"
+rootProject.name = "Slot Insight Hub"
 
 include(":app")

@@ -1,6 +1,6 @@
 {
-  "name": "Smart OSM",
-  "description": "ระบบจัดการข้อมูลอาสาสมัครสาธารณสุขประจำหมู่บ้าน (อสม.) ที่มีรากฐานด้าน Data Integrity, Identity และการ Sync ข้อมูลที่ถูกต้อง",
+  "name": "Slot Insight Hub",
+  "description": "Slot analysis and simulator hub for educational purposes.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
