@@ -16,20 +16,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.ui.SlotApp
+import com.example.ui.ObdApp
 import com.example.ui.theme.SlotInsightTheme
-import com.example.viewmodel.SlotViewModel
+import com.example.viewmodel.ObdViewModel
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: SlotViewModel by viewModels()
+    private val viewModel: ObdViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             SlotInsightTheme {
-                SlotApp(viewModel = viewModel)
+                ObdApp(viewModel = viewModel)
             }
         }
     }

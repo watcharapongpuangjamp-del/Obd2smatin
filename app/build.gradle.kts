@@ -15,7 +15,7 @@ android {
   compileSdk = 36
 
   defaultConfig {
-    applicationId = "com.aistudio.slotinsight.vjzkpx"
+    applicationId = "com.aistudio.obd2smartusb.qkzvw"
     minSdk = 24
     targetSdk = 36
     versionCode = 250

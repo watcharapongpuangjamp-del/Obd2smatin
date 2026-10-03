@@ -2,30 +2,30 @@ package com.example.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.ui.screens.AnalyzeScreen
-import com.example.ui.screens.SimulatorScreen
-import com.example.viewmodel.SlotViewModel
+import com.example.ui.screens.DashboardScreen
+import com.example.ui.screens.DiagnosticScreen
+import com.example.viewmodel.ObdViewModel
 
 sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
-    object Analyze : Screen("analyze", "Analyze", Icons.Default.Analytics)
-    object Simulator : Screen("simulator", "Simulator", Icons.Default.Casino)
+    object Dashboard : Screen("dashboard", "Dashboard", Icons.Default.Dashboard)
+    object Diagnostic : Screen("diagnostic", "Diagnostic", Icons.Default.Build)
 }
 
 @Composable
-fun SlotApp(viewModel: SlotViewModel) {
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.Analyze) }
-    val uiState by viewModel.uiState.collectAsState()
+fun ObdApp(viewModel: ObdViewModel) {
+    var currentScreen by remember { mutableStateOf<Screen>(Screen.Dashboard) }
+    val state by viewModel.obdState.collectAsState()
 
     Scaffold(
         bottomBar = {
             NavigationBar {
-                val items = listOf(Screen.Analyze, Screen.Simulator)
+                val items = listOf(Screen.Dashboard, Screen.Diagnostic)
                 items.forEach { screen ->
                     NavigationBarItem(
                         icon = { Icon(screen.icon, contentDescription = screen.label) },
@@ -38,27 +38,24 @@ fun SlotApp(viewModel: SlotViewModel) {
         }
     ) { innerPadding ->
         when (currentScreen) {
-            is Screen.Analyze -> {
-                AnalyzeScreen(
-                    urlInput = uiState.urlInput,
-                    onUrlChange = { viewModel.onUrlChange(it) },
-                    isLoading = uiState.isLoading,
-                    onRunClick = { viewModel.runAnalysis() },
-                    analysisResult = uiState.analysisResult,
+            is Screen.Dashboard -> {
+                DashboardScreen(
+                    state = state,
+                    onConnectClick = {
+                        val device = viewModel.scanForDevice()
+                        if (device != null) {
+                            viewModel.requestPermission(device)
+                            viewModel.connect(device)
+                        }
+                    },
                     modifier = Modifier.padding(innerPadding)
                 )
             }
-            is Screen.Simulator -> {
-                SimulatorScreen(
-                    credits = uiState.credits,
-                    bet = uiState.bet,
-                    rtp = uiState.rtpSetting,
-                    onRtpChange = { viewModel.onRtpChange(it) },
-                    lastResult = uiState.lastSpinResult,
-                    stats = uiState.stats,
-                    history = uiState.history,
-                    onSpin = { viewModel.spin() },
-                    onReset = { viewModel.reset() },
+            is Screen.Diagnostic -> {
+                DiagnosticScreen(
+                    dtcs = state.dtcs,
+                    onScanClick = { viewModel.scanDtcs() },
+                    onClearClick = { viewModel.clearDtcs() },
                     modifier = Modifier.padding(innerPadding)
                 )
             }

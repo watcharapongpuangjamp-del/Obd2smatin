@@ -23,6 +23,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "Slot Insight Hub"
+rootProject.name = "OBD2 Smart USB"
 
 include(":app")

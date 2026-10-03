@@ -1,6 +1,6 @@
 {
-  "name": "Slot Insight Hub",
-  "description": "Slot analysis and simulator hub for educational purposes.",
+  "name": "OBD2 Smart USB",
+  "description": "OBD2 Diagnostic & Real-time Dashboard via ELM327 USB.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
