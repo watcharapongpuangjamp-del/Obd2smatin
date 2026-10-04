@@ -17,7 +17,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.ui.ObdApp
-import com.example.ui.theme.SlotInsightTheme
+import com.example.ui.theme.ObdSmartUsbTheme
 import com.example.viewmodel.ObdViewModel
 
 class MainActivity : ComponentActivity() {
@@ -28,8 +28,25 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SlotInsightTheme {
+            ObdSmartUsbTheme {
                 ObdApp(viewModel = viewModel)
+            }
+        }
+        
+        checkUsbIntent(intent)
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        checkUsbIntent(intent)
+    }
+
+    private fun checkUsbIntent(intent: android.content.Intent?) {
+        if (android.hardware.usb.UsbManager.ACTION_USB_DEVICE_ATTACHED == intent?.action) {
+            val device = viewModel.scanForDevice()
+            if (device != null) {
+                viewModel.requestPermission(device)
+                viewModel.connect(device)
             }
         }
     }

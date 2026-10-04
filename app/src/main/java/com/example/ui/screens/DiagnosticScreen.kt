@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ fun DiagnosticScreen(
     dtcs: List<String>,
     onScanClick: () -> Unit,
     onClearClick: () -> Unit,
+    onResetClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -32,40 +34,77 @@ fun DiagnosticScreen(
             .padding(16.dp)
     ) {
         Text(
-            "Diagnostic Trouble Codes",
+            "Service & Diagnostics",
             style = MaterialTheme.typography.headlineSmall,
             color = Color.White,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        Row(
+        // Diagnostic Actions
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            colors = CardDefaults.cardColors(containerColor = DarkGray800)
         ) {
-            Button(
-                onClick = onScanClick,
-                modifier = Modifier.weight(1f).height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Emerald500)
-            ) {
-                Icon(Icons.Default.Search, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Scan DTCs")
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Fault Code Management", color = Emerald500, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Button(
+                        onClick = onScanClick,
+                        modifier = Modifier.weight(1f).height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Emerald500)
+                    ) {
+                        Icon(Icons.Default.Search, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Scan DTCs")
+                    }
+                    
+                    OutlinedButton(
+                        onClick = onClearClick,
+                        modifier = Modifier.weight(1f).height(56.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Danger),
+                        border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(Danger))
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Clear MIL")
+                    }
+                }
             }
-            
-            OutlinedButton(
-                onClick = onClearClick,
-                modifier = Modifier.weight(1f).height(56.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Danger),
-                border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(Danger))
-            ) {
-                Icon(Icons.Default.Delete, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Clear MIL")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // System Actions
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = DarkGray800)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("System Tools", color = Color.Gray, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = onResetClick,
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
+                ) {
+                    Icon(Icons.Default.Refresh, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Hard Reset Adapter (AT Z)")
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+        HorizontalDivider(color = Color.DarkGray)
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        Text("Detected DTCs (${dtcs.size})", color = Color.Gray, fontSize = 14.sp)
+        Spacer(modifier = Modifier.height(8.dp))
 
         if (dtcs.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

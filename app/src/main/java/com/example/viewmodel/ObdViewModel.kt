@@ -31,20 +31,39 @@ class ObdViewModel(application: Application) : AndroidViewModel(application) {
         usbManager.requestPermission(device)
     }
 
-    fun connect(device: UsbDevice, protocol: ObdProtocol = ObdProtocol.AUTO) {
+    fun connect(device: UsbDevice) {
         viewModelScope.launch {
-            if (repository.connect(device, protocol)) {
+            if (repository.connect(device, obdState.value.selectedProtocol)) {
                 startPolling()
             }
         }
     }
 
+    fun setSelectedProtocol(protocol: ObdProtocol) {
+        repository.setSelectedProtocol(protocol)
+    }
+
     private fun startPolling() {
         dataJob?.cancel()
         dataJob = viewModelScope.launch {
+            var errorCount = 0
             while (obdState.value.connectionStatus == ConnectionStatus.CONNECTED) {
-                repository.updateLiveData()
-                delay(200) // Poll every 200ms
+                try {
+                    repository.updateLiveData()
+                    errorCount = 0
+                    delay(100) // Poll every 100ms (10Hz)
+                } catch (e: Exception) {
+                    errorCount++
+                    if (errorCount > 3) {
+                        // Attempt auto-reconnect
+                        val device = scanForDevice()
+                        if (device != null) {
+                            connect(device)
+                        }
+                        break
+                    }
+                    delay(500)
+                }
             }
         }
     }

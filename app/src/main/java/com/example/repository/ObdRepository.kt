@@ -103,9 +103,11 @@ class ObdRepository(private val usbManager: UsbSerialManager) {
     suspend fun scanDtcs() = withContext(Dispatchers.IO) {
         try {
             val resp = sendCommand("03")
-            // Simple DTC Parser (Simplified)
-            val codes = resp.replace(">", "").trim().split(" ").filter { it.length == 2 }
-            // Real implementation would decode 43 01 07 ... to P0107 etc.
+            val codes = try {
+                OBD2Parser.parseDtcList(resp)
+            } catch (e: Exception) {
+                emptyList()
+            }
             _obdState.value = _obdState.value.copy(dtcs = codes)
         } catch (e: Exception) {
             Log.e("ObdRepository", "DTC Error: ${e.message}")
@@ -118,7 +120,9 @@ class ObdRepository(private val usbManager: UsbSerialManager) {
     }
 
     suspend fun resetAdapter() = withContext(Dispatchers.IO) {
-        sendCommand("AT Z")
+        sendCommand("AT WS") // Warm Start
+        delay(500)
+        sendCommand("AT Z")  // Full Reset
         delay(1000)
         _obdState.value = _obdState.value.copy(connectionStatus = ConnectionStatus.DISCONNECTED)
     }
@@ -127,5 +131,9 @@ class ObdRepository(private val usbManager: UsbSerialManager) {
         isRunning = false
         usbManager.disconnect()
         _obdState.value = _obdState.value.copy(connectionStatus = ConnectionStatus.DISCONNECTED)
+    }
+
+    fun setSelectedProtocol(protocol: ObdProtocol) {
+        _obdState.value = _obdState.value.copy(selectedProtocol = protocol)
     }
 }

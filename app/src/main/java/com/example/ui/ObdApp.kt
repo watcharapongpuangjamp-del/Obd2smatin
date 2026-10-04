@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.model.ObdProtocol
 import com.example.ui.screens.DashboardScreen
 import com.example.ui.screens.DiagnosticScreen
 import com.example.viewmodel.ObdViewModel
@@ -48,6 +49,7 @@ fun ObdApp(viewModel: ObdViewModel) {
                             viewModel.connect(device)
                         }
                     },
+                    onProtocolSelected = { viewModel.setSelectedProtocol(it) },
                     modifier = Modifier.padding(innerPadding)
                 )
             }
@@ -56,6 +58,7 @@ fun ObdApp(viewModel: ObdViewModel) {
                     dtcs = state.dtcs,
                     onScanClick = { viewModel.scanDtcs() },
                     onClearClick = { viewModel.clearDtcs() },
+                    onResetClick = { viewModel.resetAdapter() },
                     modifier = Modifier.padding(innerPadding)
                 )
             }

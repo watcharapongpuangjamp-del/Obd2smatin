@@ -25,7 +25,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun SlotInsightTheme(
+fun ObdSmartUsbTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = DarkColorScheme

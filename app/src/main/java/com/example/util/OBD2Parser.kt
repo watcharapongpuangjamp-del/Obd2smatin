@@ -116,4 +116,67 @@ object OBD2Parser {
     fun parseVoltage(response: String): String {
         return response.replace(">", "").trim()
     }
+
+    /**
+     * แปลง Raw Hex เป็น DTC Standard (เช่น P0100)
+     * @param bytes List ของ Hex String 2 bytes (เช่น ["01", "00"])
+     */
+    fun decodeDtc(bytes: List<String>): String {
+        if (bytes.size < 2) return "Unknown"
+        
+        val b1 = bytes[0].toInt(16)
+        val b2 = bytes[1].toInt(16)
+
+        // ตัวอักษรตัวแรก (P, C, B, U)
+        val firstChar = when ((b1 shr 6) and 0x03) {
+            0 -> "P" // Powertrain
+            1 -> "C" // Chassis
+            2 -> "B" // Body
+            3 -> "U" // Network
+            else -> "?"
+        }
+
+        // ตัวเลขตัวที่สอง (0, 1, 2, 3)
+        val secondChar = ((b1 shr 4) and 0x03).toString()
+
+        // ตัวที่เหลือ
+        val thirdChar = Integer.toHexString((b1 and 0x0F)).uppercase()
+        val fourthChar = Integer.toHexString((b2 shr 4) and 0x0F).uppercase()
+        val fifthChar = Integer.toHexString(b2 and 0x0F).uppercase()
+
+        return "$firstChar$secondChar$thirdChar$fourthChar$fifthChar"
+    }
+
+    /**
+     * แยก DTCs จาก Mode 03 response
+     * Format: 43 02 01 00 01 07 ...
+     * (43 คือ Mode, 02 คือจำนวน DTCs, จากนั้นคือคู่ของ 2 bytes ต่อ 1 code)
+     */
+    fun parseDtcList(response: String): List<String> {
+        checkError(response)?.let { throw Exception(it) }
+        val hexList = cleanResponse(response)
+        
+        // กรองเอาเฉพาะข้อมูลหลังจาก '43'
+        val startIndex = hexList.indexOf("43")
+        if (startIndex == -1) return emptyList()
+
+        val dtcData = hexList.subList(startIndex + 1, hexList.size)
+        // บาง ECU อาจส่งจำนวน DTC มาใน byte แรก (ขึ้นอยู่กับโปรโตคอล)
+        // แต่มาตรฐานพื้นฐานคืออ่านทีละ 2 bytes จนจบ
+        
+        val dtcs = mutableListOf<String>()
+        var i = 0
+        // ข้าม byte แรกที่มักจะเป็นจำนวน DTC หากมี
+        if (dtcData.size % 2 != 0) i = 1 
+        
+        while (i + 1 < dtcData.size) {
+            val code = decodeDtc(listOf(dtcData[i], dtcData[i+1]))
+            // P0000 มักหมายถึงไม่มี Error
+            if (code != "P0000") {
+                dtcs.add(code)
+            }
+            i += 2
+        }
+        return dtcs.distinct()
+    }
 }

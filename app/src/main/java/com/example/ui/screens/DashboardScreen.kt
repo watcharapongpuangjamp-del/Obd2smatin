@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.model.ConnectionStatus
 import com.example.model.ObdDataState
+import com.example.model.ObdProtocol
 import com.example.ui.components.Gauge
 import com.example.ui.theme.DarkGray800
 import com.example.ui.theme.Emerald500
@@ -29,8 +30,11 @@ import com.example.ui.theme.Danger
 fun DashboardScreen(
     state: ObdDataState,
     onConnectClick: () -> Unit,
+    onProtocolSelected: (ObdProtocol) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showProtocolMenu by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -43,32 +47,97 @@ fun DashboardScreen(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = DarkGray800)
         ) {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text("Connection Status", color = Color.Gray, fontSize = 12.sp)
-                    Text(
-                        text = state.connectionStatus.name,
-                        color = when(state.connectionStatus) {
-                            ConnectionStatus.CONNECTED -> Success
-                            ConnectionStatus.ERROR -> Danger
-                            else -> Color.White
-                        },
-                        fontWeight = FontWeight.Bold
-                    )
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text("Connection Status", color = Color.Gray, fontSize = 12.sp)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(
+                                        when(state.connectionStatus) {
+                                            ConnectionStatus.CONNECTED -> Success
+                                            ConnectionStatus.ERROR -> Danger
+                                            else -> Color.Gray
+                                        }
+                                    )
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = state.connectionStatus.name,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    // Battery Voltage Chip
+                    if (state.connectionStatus == ConnectionStatus.CONNECTED) {
+                        Surface(
+                            color = Emerald500.copy(alpha = 0.2f),
+                            shape = RoundedCornerShape(16.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Emerald500)
+                        ) {
+                            Text(
+                                text = state.voltage,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                color = Emerald500,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                    
+                    if (state.connectionStatus != ConnectionStatus.CONNECTED && state.connectionStatus != ConnectionStatus.CONNECTING) {
+                        Button(
+                            onClick = onConnectClick,
+                            colors = ButtonDefaults.buttonColors(containerColor = Emerald500)
+                        ) {
+                            Icon(Icons.Default.Usb, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Connect")
+                        }
+                    } else if (state.connectionStatus == ConnectionStatus.CONNECTING) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Emerald500)
+                    }
                 }
-                
+
                 if (state.connectionStatus != ConnectionStatus.CONNECTED) {
-                    Button(
-                        onClick = onConnectClick,
-                        colors = ButtonDefaults.buttonColors(containerColor = Emerald500)
-                    ) {
-                        Icon(Icons.Default.Usb, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Connect")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    HorizontalDivider(color = Color.DarkGray)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Text("Protocol Setting", color = Color.Gray, fontSize = 12.sp)
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        OutlinedButton(
+                            onClick = { showProtocolMenu = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(state.selectedProtocol.description, color = Color.White)
+                        }
+                        
+                        DropdownMenu(
+                            expanded = showProtocolMenu,
+                            onDismissRequest = { showProtocolMenu = false },
+                            modifier = Modifier.fillMaxWidth(0.9f).background(DarkGray800)
+                        ) {
+                            com.example.model.ObdProtocol.values().forEach { protocol ->
+                                DropdownMenuItem(
+                                    text = { Text(protocol.description, color = Color.White) },
+                                    onClick = {
+                                        onProtocolSelected(protocol)
+                                        showProtocolMenu = false
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }

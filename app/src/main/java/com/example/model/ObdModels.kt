@@ -9,6 +9,7 @@ data class ObdDataState(
     val dtcs: List<String> = emptyList(),
     val connectionStatus: ConnectionStatus = ConnectionStatus.DISCONNECTED,
     val currentProtocol: String = "Unknown",
+    val selectedProtocol: ObdProtocol = ObdProtocol.AUTO,
     val lastError: String? = null
 )
 
